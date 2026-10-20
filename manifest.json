@@ -1,0 +1,9 @@
+{
+  "name": "ShrineBag",
+  "version_number": "1.0.0",
+  "website_url": "",
+  "description": "Configurable finite shuffled bag implementation for Shrines of Chance.",
+  "dependencies": [
+    "bbepis-BepInExPack-5.4.2117"
+  ]
+}
