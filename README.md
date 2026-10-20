@@ -33,7 +33,7 @@ The hook calls the original `ShrineChanceBehavior.AddShrineStack` method, tempor
 Any mod that replaces `AddShrineStack`, bypasses the vanilla failure check, or changes `failureChance` in a weird way may still conflict.
 
 ## Contact
-* Discord: `papitaconpure` (please be nice I'll cry)
+* Discord: `papitaconpure` (please be nice or I'll cry)
 
 ## Additional Information
 god i love megumin she's so cute she's so precious oooo what the fu
