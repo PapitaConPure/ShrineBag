@@ -19,6 +19,9 @@ I made this mod because my luck sucks and the vanilla behavior sucks even more. 
 
 For context: default behavior is 2 rewards vs. 6 failures, for a total bag size of 8. This means that the worst-case scenario consists of 8 purchases: 6 failures first and then 2 rewards. The best-case scenario would still be 2 rewards up front.
 
+## Build
+Remember to check the .csproj and replace all applicable paths with the ones that match yours.
+
 ## Risk of Options
 There's a compile flag for Risk of Options integration. My brain is very smooth so I might just hard-depend on the thing if I don't get it working. I'm so sorry for adding one more mod to your 300+ mod profile if that's the case (you already have RoO installed don't lie to me).
 
