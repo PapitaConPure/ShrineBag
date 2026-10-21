@@ -58,7 +58,7 @@ namespace ShrineBag {
 		public static readonly ConstrainedEntry<int, RangeEntryConstraint<int>> Failures = new(
 			name: "Max. Failures",
 			description: "Number of prayers that will yield nothing.\n=== You offer to the shrine, but gain nothing. ===",
-			defaultValue: 6,
+			defaultValue: 4,
 			constraint: new(min: 0, max: 20));
 	}
 }

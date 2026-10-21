@@ -9,7 +9,7 @@ namespace ShrineBag {
 	public sealed class Plugin: BaseUnityPlugin {
 		public const string PluginGuid = "com.papitaconpure.shrinebag";
 		public const string PluginName = "Shrine Bag";
-		public const string PluginVersion = "1.0.0";
+		public const string PluginVersion = "1.0.1";
 
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;
@@ -53,18 +53,12 @@ namespace ShrineBag {
 			float previousFailureChance = self.failureChance;
 
 			self.failureChance = reward ? -1f : 1f;
+			self.maxPurchaseCount = RewardCount.Value;
 
 			try {
 				origAddShrineStack(self, activator);
 			} finally {
 				self.failureChance = previousFailureChance;
-			}
-
-			if(bag.IsDepleted) {
-				PurchaseInteraction interaction = self.GetComponent<PurchaseInteraction>();
-				interaction?.SetAvailable(false);
-			} else if(self.successfulPurchaseCount >= self.maxPurchaseCount) {
-				self.successfulPurchaseCount--;
 			}
 		}
 

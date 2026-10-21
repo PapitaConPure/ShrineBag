@@ -1,6 +1,6 @@
 {
   "name": "ShrineBag",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "",
   "description": "Configurable finite shuffled bag implementation for Shrines of Chance.",
   "dependencies": [

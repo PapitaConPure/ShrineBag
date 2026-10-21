@@ -5,9 +5,9 @@ I made this mod because my luck sucks and the vanilla behavior sucks even more. 
 
 ## Features
 * Each shrine gets its own finite bag of outcomes.
-* Each bag contains 2 'reward' outcomes (configurable) and 6 'failure' outcomes (configurable).
+* Each bag contains 2 'reward' outcomes (configurable) and 4 'failure' outcomes (configurable).
 * Bags are shuffled independently for each shrine.
-* Vanilla reward/failure logic remains pretty much untouched. The mod simply forces a reward or failure after a shrine takes an outcome from its bag. Compatibility should be pretty good.
+* Vanilla reward/failure logic remains pretty much untouched. The mod forces a reward or failure after a shrine takes an outcome from its bag and updates the maximum purchases to match the configured total rewards. Compatibility should be pretty good.
 * After the bag is exhausted, that shrine remains unavailable even if you don't hit the vanilla purchase limit (2). Likewise, if the configured number of rewards surpasses that of vanilla, the Shrine will remain active until the bag is empty.
 * A shrine will get preemptively disabled if only failure outcomes remain in its bag.
 
@@ -17,7 +17,7 @@ I made this mod because my luck sucks and the vanilla behavior sucks even more. 
 * `Total Rewards`: The number of 'reward' outcomes to put in each bag.
 * `Max. Failures`: The number of 'failure' outcomes to put in each bag. Failures after the final reward are trimmed out.
 
-For context: default behavior is 2 rewards vs. 6 failures, for a total bag size of 8. This means that the worst-case scenario consists of 8 purchases: 6 failures first and then 2 rewards. The best-case scenario would still be 2 rewards up front.
+For context: default behavior is 2 rewards vs. 4 failures, for a total bag size of 6. This means that the worst-case scenario consists of 8 purchases: 4 failures first and then 2 rewards. The best-case scenario would still be 2 rewards up front.
 
 ## Build
 Remember to check the .csproj and replace all applicable paths with the ones that match yours.
@@ -28,9 +28,9 @@ There's a compile flag for Risk of Options integration. My brain is very smooth 
 To compile with Risk of Options, place `RiskOfOptions.dll` at `<BepInExDir>/plugins/Rune580-Risk_Of_Options/RiskOfOptions/` and build the thing with `-p:EnableRiskOfOptions=true`.
 
 ## Compatibility notes
-The hook calls the original `ShrineChanceBehavior.AddShrineStack` method, temporarily forcing its failure threshold. This should preserve the functionality of most hooks that call the original method.
+The hook calls the original `ShrineChanceBehavior.AddShrineStack` method, temporarily forcing the `On.RoR2.ShrineChanceBehavior.failureChance` threshold. It also needs to update and persist `On.RoR2.ShrineChanceBehavior.maxPurchaseCount` to match the configured total reward count. This should preserve the functionality of most hooks that call the original method (maybe).
 
-Any mod that replaces `AddShrineStack`, bypasses the vanilla failure check, or changes `failureChance` in a weird way may still conflict.
+Any mod that replaces `AddShrineStack`, bypasses the vanilla failure check, changes `failureChance` in a weird way, or depends on `maxPurchaseCount` in a peculiar way may still conflict.
 
 ## Contact
 * Discord: `papitaconpure` (please be nice or I'll cry)
