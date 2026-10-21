@@ -17,7 +17,7 @@ I made this mod because my luck sucks and the vanilla behavior sucks even more. 
 * `Total Rewards`: The number of 'reward' outcomes to put in each bag.
 * `Max. Failures`: The number of 'failure' outcomes to put in each bag. Failures after the final reward are trimmed out.
 
-For context: default behavior is 2 rewards vs. 4 failures, for a total bag size of 6. This means that the worst-case scenario consists of 8 purchases: 4 failures first and then 2 rewards. The best-case scenario would still be 2 rewards up front.
+For context: default behavior is 2 rewards vs. 4 failures, for a total bag size of 6. This means that the worst-case scenario consists of 6 purchases: 4 failures first and then 2 rewards. The best-case scenario would still be 2 rewards up front.
 
 ## Build
 Remember to check the .csproj and replace all applicable paths with the ones that match yours.
