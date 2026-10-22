@@ -83,14 +83,6 @@ namespace ShrineBag {
 		}
 
 		/// <summary>
-		/// Gets the total number of rewards available across bags owned by the market.
-		/// </summary>
-		public int GetTotalRewardCount(int configuredBagRewardCount)
-			=> this.infinite
-				? int.MaxValue
-				: ModSettings.RewardCount.Constraint.Clamp(configuredBagRewardCount) * this.totalBags;
-
-		/// <summary>
 		/// Tries to create a new bag based on the configured bag generation settings.
 		/// </summary>
 		/// <param name="configuredBagRewardCount">The configured reward count.</param>

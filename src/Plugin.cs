@@ -69,7 +69,12 @@ namespace ShrineBag {
 			float previousFailureChance = self.failureChance;
 
 			self.failureChance = rewarded ? -1f : 1f;
-			self.maxPurchaseCount = bagMarket.GetTotalRewardCount(RewardCount.Value);
+
+			if(rewarded)
+				//Offset by one because it's set before orig
+				self.maxPurchaseCount = bagMarket.IsDepleted
+					? self.successfulPurchaseCount + 1
+					: self.successfulPurchaseCount + 2;
 
 			try {
 				origAddShrineStack(self, activator);
@@ -133,7 +138,7 @@ namespace ShrineBag {
 
 			try {
 				ModSettingsManagerCompat.SetModDescription(
-					"Each Shrine of Chance gets a finite shuffled bag with a configurable number of rewards and failures.");
+					"Makes Shrines of Chance use finite, shuffled bags instead of being fully random!");
 				ModSettingsManagerCompat.SetModIcon(ModIcon.Load());
 
 				ModSettingsManagerCompat.AddCheckboxOption(Enabled);
