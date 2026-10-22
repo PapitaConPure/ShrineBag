@@ -7,7 +7,7 @@ namespace ShrineBag.Settings {
 			string section,
 			string name,
 			string description,
-			TValue @default)
+			TValue defaultValue)
 			where TValue : IComparable {
 			public string Section { get; } = section;
 
@@ -15,7 +15,7 @@ namespace ShrineBag.Settings {
 
 			public string Description { get; } = description;
 
-			public TValue Default { get; } = @default;
+			public TValue Default { get; } = defaultValue;
 
 			public virtual ConfigEntry<TValue> RegisterFor(Plugin plugin)
 				=> plugin.Config.Bind(
@@ -62,5 +62,8 @@ namespace ShrineBag.Settings {
 
 			public bool IsValid(object value) => this.AcceptableValue.IsValid(value);
 		}
+
+		private static string Paragraph(params string[] lines)
+			=> string.Join("\n", lines);
 	}
 }

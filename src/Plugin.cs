@@ -17,9 +17,12 @@ namespace ShrineBag {
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;
 		internal static ConfigEntry<int> FailureCount;
-		internal static ConfigEntry<ModSettings.BagsPerShrineOption> BagsPerShrine;
+		internal static ConfigEntry<ModSettings.BagGenModeKey> BagGenMode;
+		internal static ConfigEntry<int> BagGenCount;
+		internal static ConfigEntry<bool> OnlyTrimLast;
 		internal static ConfigEntry<float> CreditsFactor;
-		internal static ConfigEntry<bool> TheCouncil;
+		internal static ConfigEntry<bool> CouncilEnabled;
+		internal static ConfigEntry<int> CouncilSize;
 		internal static ConfigEntry<bool> Megumin;
 
 		private static ShrineChanceSpawnCardManager shrineChanceSpawnCardManager;
@@ -52,10 +55,11 @@ namespace ShrineBag {
 				return;
 			}
 
-			ShrineChanceBag bag = self.GetComponent<ShrineChanceBag>() ?? self.gameObject.AddComponent<ShrineChanceBag>();
+			ShrineChanceBagMarket bagMarket = self.GetComponent<ShrineChanceBagMarket>() ?? self.gameObject.AddComponent<ShrineChanceBagMarket>();
 
-			if(!bag.TryDraw(RewardCount.Value, FailureCount.Value, out bool reward)) {
-				//Disable bag after using final entry, before another purchase can happen
+			if(!bagMarket.TryGetUsableBag(RewardCount.Value, FailureCount.Value, BagGenMode.Value, BagGenCount.Value, OnlyTrimLast.Value, out ShrineChanceBag bag)
+			|| !bag.TryDraw(out bool rewarded)) {
+				//Disable after using final entry from final bag, before another purchase can happen
 				PurchaseInteraction interaction = self.GetComponent<PurchaseInteraction>();
 				interaction?.SetAvailable(false);
 				return;
@@ -64,8 +68,8 @@ namespace ShrineBag {
 			//Keep as vanilla/compatible as possible
 			float previousFailureChance = self.failureChance;
 
-			self.failureChance = reward ? -1f : 1f;
-			self.maxPurchaseCount = RewardCount.Value;
+			self.failureChance = rewarded ? -1f : 1f;
+			self.maxPurchaseCount = bagMarket.GetTotalRewardCount(RewardCount.Value);
 
 			try {
 				origAddShrineStack(self, activator);
@@ -96,26 +100,31 @@ namespace ShrineBag {
 		private static void VehicleSeat_OnPassengerExit(On.RoR2.VehicleSeat.orig_OnPassengerExit origOnPassengerExit, VehicleSeat self, GameObject passenger) {
 			origOnPassengerExit(self, passenger);
 
-			if(!NetworkServer.active || self == null)
+			if(!NetworkServer.active || self == null || !Enabled.Value)
 				return;
 
-			if(TheEvilCouncil.Spawned)
+			if(!self.currentPassengerBody.isPlayerControlled || Run.instance.stageClearCount != 0)
 				return;
 
-			if(Run.instance.stageClearCount == 0 && TheCouncil.Value)
-				TheEvilCouncil.BeEvil();
+			if(TheEvilCouncil.AlreadySpawned || !CouncilEnabled.Value)
+				return;
+
+			TheEvilCouncil.BeEvil(CouncilSize.Value);
 		}
 
 		private void RegisterSettings() {
 			Enabled       = ModSettings.Enabled.RegisterFor(this);
-			RewardCount   = ModSettings.Rewards.RegisterFor(this);
-			FailureCount  = ModSettings.Failures.RegisterFor(this);
-			BagsPerShrine = ModSettings.BagsPerShrine.RegisterFor(this);
+			RewardCount   = ModSettings.RewardCount.RegisterFor(this);
+			FailureCount  = ModSettings.FailureCount.RegisterFor(this);
+			BagGenMode    = ModSettings.BagGenMode.RegisterFor(this);
+			BagGenCount   = ModSettings.BagGenCount.RegisterFor(this);
+			OnlyTrimLast  = ModSettings.OnlyTrimLastBag.RegisterFor(this);
 			CreditsFactor = ModSettings.CreditsFactor.RegisterFor(this);
 
-			TheCouncil    = ModSettings.TheCouncil.RegisterFor(this);
+			CouncilEnabled = ModSettings.CouncilEnabled.RegisterFor(this);
+			CouncilSize    = ModSettings.CouncilSize.RegisterFor(this);
 
-			Megumin       = ModSettings.Megumin.RegisterFor(this);
+			Megumin = ModSettings.Megumin.RegisterFor(this);
 		}
 
 		private void TryRegisterRiskOfOptions() {
@@ -130,10 +139,13 @@ namespace ShrineBag {
 				ModSettingsManagerCompat.AddCheckboxOption(Enabled);
 				ModSettingsManagerCompat.AddSliderOption(RewardCount);
 				ModSettingsManagerCompat.AddSliderOption(FailureCount);
-				ModSettingsManagerCompat.AddChoiceOption(BagsPerShrine);
+				ModSettingsManagerCompat.AddChoiceOption(BagGenMode);
+				ModSettingsManagerCompat.AddSliderOption(BagGenCount);
+				ModSettingsManagerCompat.AddCheckboxOption(OnlyTrimLast);
 				ModSettingsManagerCompat.AddSliderOption(CreditsFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
 
-				ModSettingsManagerCompat.AddCheckboxOption(TheCouncil);
+				ModSettingsManagerCompat.AddCheckboxOption(CouncilEnabled);
+				ModSettingsManagerCompat.AddSliderOption(CouncilSize);
 
 				ModSettingsManagerCompat.AddCheckboxOption(Megumin);
 			} catch(Exception exception) {
