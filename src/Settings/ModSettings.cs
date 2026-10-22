@@ -71,7 +71,7 @@
 			section: "General",
 			name: "Credit Cost Multiplier",
 			description: Paragraph(
-				"You can scale the spawn cost of each shrine by a factor in relation to vanilla." +
+				"You can scale the spawn cost of each shrine by a factor in relation to vanilla.",
 				"This may help with balance but it's usually better left untouched.",
 				"",
 				"By the way, I didn't actually test this works. Whoops! Default should tho."),
