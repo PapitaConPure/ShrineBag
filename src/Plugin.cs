@@ -12,7 +12,7 @@ namespace ShrineBag {
 	public sealed class Plugin: BaseUnityPlugin {
 		public const string PluginGuid = "com.papitaconpure.shrinebag";
 		public const string PluginName = "Shrine Bag";
-		public const string PluginVersion = "1.0.2";
+		public const string PluginVersion = "1.1.0";
 
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;
