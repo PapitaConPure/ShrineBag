@@ -1,6 +1,9 @@
 using BepInEx;
 using BepInEx.Configuration;
 using RoR2;
+using ShrineBag.Settings;
+using System;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ShrineBag {
@@ -14,28 +17,37 @@ namespace ShrineBag {
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;
 		internal static ConfigEntry<int> FailureCount;
+		internal static ConfigEntry<ModSettings.BagsPerShrineOption> BagsPerShrine;
+		internal static ConfigEntry<float> CreditsFactor;
+		internal static ConfigEntry<bool> TheCouncil;
+		internal static ConfigEntry<bool> Megumin;
 
-		private void Awake() {
+		private static ShrineChanceSpawnCardManager shrineChanceSpawnCardManager;
+
+		public void Awake() {
 			this.RegisterSettings();
 			this.TryRegisterRiskOfOptions();
 
-			On.RoR2.ShrineChanceBehavior.AddShrineStack += OnAddShrineStack;
+			On.RoR2.ShrineChanceBehavior.AddShrineStack += ShrineChanceBehavior_AddShrineStack;
+			On.RoR2.SceneDirector.Start += SceneDirector_Start;
+			On.RoR2.VehicleSeat.OnPassengerExit += VehicleSeat_OnPassengerExit;
 
 #if DEBUG
 			this.Logger.LogInfo($"{PluginName} {PluginVersion} loaded.");
 #endif
 		}
 
-		private void OnDestroy() {
-			On.RoR2.ShrineChanceBehavior.AddShrineStack -= OnAddShrineStack;
+		public void OnDestroy() {
+			On.RoR2.ShrineChanceBehavior.AddShrineStack -= ShrineChanceBehavior_AddShrineStack;
+			On.RoR2.SceneDirector.Start -= SceneDirector_Start;
+			On.RoR2.VehicleSeat.OnPassengerExit -= VehicleSeat_OnPassengerExit;
 		}
 
-		private static void OnAddShrineStack(
+		private static void ShrineChanceBehavior_AddShrineStack(
 			On.RoR2.ShrineChanceBehavior.orig_AddShrineStack origAddShrineStack,
 			ShrineChanceBehavior self,
 			Interactor activator) {
-
-			if(!NetworkServer.active || !Enabled.Value || self == null) {
+			if(!NetworkServer.active || self == null || !Enabled.Value) {
 				origAddShrineStack(self, activator);
 				return;
 			}
@@ -49,7 +61,7 @@ namespace ShrineBag {
 				return;
 			}
 
-			//Keep as vanilla-compatible as possible
+			//Keep as vanilla/compatible as possible
 			float previousFailureChance = self.failureChance;
 
 			self.failureChance = reward ? -1f : 1f;
@@ -62,28 +74,48 @@ namespace ShrineBag {
 			}
 		}
 
+		//Could just set the credit cost in Awake, but config change would require a restart
+		private static void SceneDirector_Start(On.RoR2.SceneDirector.orig_Start origStart, SceneDirector self) {
+			if(!NetworkServer.active || self == null) {
+				origStart(self);
+				return;
+			}
+
+			TheEvilCouncil.Prepare();
+
+			shrineChanceSpawnCardManager ??= new();
+
+			if(Enabled.Value && CreditsFactor.Value != 1f)
+				shrineChanceSpawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
+			else if(shrineChanceSpawnCardManager.Initialized)
+				shrineChanceSpawnCardManager.ResetCreditCost();
+
+			origStart(self);
+		}
+
+		private static void VehicleSeat_OnPassengerExit(On.RoR2.VehicleSeat.orig_OnPassengerExit origOnPassengerExit, VehicleSeat self, GameObject passenger) {
+			origOnPassengerExit(self, passenger);
+
+			if(!NetworkServer.active || self == null)
+				return;
+
+			if(TheEvilCouncil.Spawned)
+				return;
+
+			if(Run.instance.stageClearCount == 0 && TheCouncil.Value)
+				TheEvilCouncil.BeEvil();
+		}
+
 		private void RegisterSettings() {
-			Enabled = this.Config.Bind(
-				"General",
-				ModSettings.Enabled.Name,
-				ModSettings.Enabled.Default,
-				ModSettings.Enabled.Description);
+			Enabled       = ModSettings.Enabled.RegisterFor(this);
+			RewardCount   = ModSettings.Rewards.RegisterFor(this);
+			FailureCount  = ModSettings.Failures.RegisterFor(this);
+			BagsPerShrine = ModSettings.BagsPerShrine.RegisterFor(this);
+			CreditsFactor = ModSettings.CreditsFactor.RegisterFor(this);
 
-			RewardCount = this.Config.Bind(
-				"General",
-				ModSettings.Rewards.Name,
-				ModSettings.Rewards.Default,
-				new ConfigDescription(
-					ModSettings.Rewards.Description,
-					ModSettings.Rewards.Constraint.AcceptableValue));
+			TheCouncil    = ModSettings.TheCouncil.RegisterFor(this);
 
-			FailureCount = this.Config.Bind(
-				"General",
-				ModSettings.Failures.Name,
-				ModSettings.Failures.Default,
-				new ConfigDescription(
-					ModSettings.Failures.Description,
-					ModSettings.Failures.Constraint.AcceptableValue));
+			Megumin       = ModSettings.Megumin.RegisterFor(this);
 		}
 
 		private void TryRegisterRiskOfOptions() {
@@ -96,13 +128,15 @@ namespace ShrineBag {
 				ModSettingsManagerCompat.SetModIcon(ModIcon.Load());
 
 				ModSettingsManagerCompat.AddCheckboxOption(Enabled);
+				ModSettingsManagerCompat.AddSliderOption(RewardCount);
+				ModSettingsManagerCompat.AddSliderOption(FailureCount);
+				ModSettingsManagerCompat.AddChoiceOption(BagsPerShrine);
+				ModSettingsManagerCompat.AddSliderOption(CreditsFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
 
-				ModSettingsManagerCompat.AddSliderOption(RewardCount,
-					ModSettings.Rewards.Constraint as ModSettings.RangeEntryConstraint<int>);
+				ModSettingsManagerCompat.AddCheckboxOption(TheCouncil);
 
-				ModSettingsManagerCompat.AddSliderOption(FailureCount,
-					ModSettings.Failures.Constraint as ModSettings.RangeEntryConstraint<int>);
-			} catch(System.Exception exception) {
+				ModSettingsManagerCompat.AddCheckboxOption(Megumin);
+			} catch(Exception exception) {
 				this.Logger.LogWarning($"Could not register Risk of Options settings: {exception}");
 			}
 		}
