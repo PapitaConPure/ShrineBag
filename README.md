@@ -43,10 +43,10 @@ When "Bag Gen. Mode" is set to **Infinite**, "Only Trim Last Bag" determines if 
 ### Testing
 | Name                   | Type    | Default | Description |
 |------------------------|---------|---------|-------------|
-| Spawn The Council      | Toggle  | Off     | Spawns ***'The Council'*** on stage 1. |
+| Spawn The Council      | Evil    | Off     | Spawns ***'The Council'*** on stage 1. |
 | Council Size           | Integer | `5`     | Sets the number of members that make up ***'The Council'***. |
 
-***'The Council'*** is an EVIL organization consisting of a configurable(**) circle of Shrines of Chance. ***EVIL***.
+***'The Council'*** is an EVIL organization consisting of a configurable(*) circle of Shrines of Chance. ***EVIL***.
 
 (*) Please note: the canonical size of ***'The Council'*** is 5. Members are: Frankie, Chicho, Paulie, Sebastian, and Maurice.
 
@@ -61,25 +61,19 @@ Megumin.
 * Discord: `papitaconpure` (please be nice or I'll cry)
 
 ## Compatibility notes
+From what I've tested: `hurleyapieaye-FasterChances` and `sylvie-ProactiveChanceDoll` work just fine.
+
+I haven't really tested compatibility with mods that make Shrines of Chance infinite, but you can also use this mod for that. You just gotta configure it ("Bag Gen. Mode" = **Infinite**).
+
+### Nerd
 The hook calls the original `ShrineChanceBehavior.AddShrineStack` method, temporarily forcing the `On.RoR2.ShrineChanceBehavior.failureChance` threshold. It also needs to update and persist `On.RoR2.ShrineChanceBehavior.maxPurchaseCount` to match the configured total reward count. This should preserve the functionality of most hooks that call the original method (maybe).
 
 Any mod that replaces `AddShrineStack`, bypasses the vanilla failure check, changes `failureChance` in a weird way, or depends on `maxPurchaseCount` in a peculiar way may still conflict.
 
-## Build
-Remember to check the .csproj and replace all applicable paths with the ones that match your install.
-
-### Risk of Options
-There's a compile flag for Risk of Options integration. It's set to `true` by default.
-
-To compile with Risk of Options, place `RiskOfOptions.dll` at `<BepInExDir>/plugins/Rune580-Risk_Of_Options/RiskOfOptions/` and build the thing.
-
-If for some reason you don't want that, build the thing with `-p:EnableRiskOfOptions=false`.
-
 ## Changelog
-* **v1.1.0** - Added configurable amount and trimming of bags per shrine, stage director "Credit Cost Multiplier" option and ***'The Council'*** (EVIL).
-* **v1.0.2** - Fixed some README things. Nothing ever happens.
-* **v1.0.1** - Fixed a bug related to the "Total Rewards" behavior when pinging shrines.
-* **v1.0.0** - I gave birth to this. pregnant emoji
+Read the thing on [Thunderstore](https://thunderstore.io/c/riskofrain2/p/PapitaConPure/ShrineBag/changelog) or [GitHub](https://github.com/PapitaConPure/ShrineBag/blob/master/CHANGELOG.md). Should be the same on both places unless I'm currently doing something on GitHub (never?????????)
 
-## Additional Information
+## Additional Info
+Build info [here](https://github.com/PapitaConPure/ShrineBag/blob/master/wik/build.md).
+
 god i love megumin she's so cute she's so precious oooo what the fu
