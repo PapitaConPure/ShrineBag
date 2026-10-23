@@ -2,7 +2,7 @@
 
 on:
   push:
-    tags: ["v*"]
+    tags: [ 'v*' ]
 
 permissions:
   contents: write
@@ -16,14 +16,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-        
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
-        
+
       - name: Restore project
         run: |
           dotnet restore
@@ -31,14 +29,14 @@ jobs:
 
       - name: Build and pack project
         run: dotnet pack -c Release
-          
-      - name: Upload Thunderstore Artifact
+      
+      - name: Upload Thunderstore artifact
         uses: actions/upload-artifact@v7
         with:
           name: thunderstore-build
           path: ./dist/*.zip
 
-  upload-release-artifact:
+  upload-release-artifacts:
     name: Upload Release Artifacts
     needs: build
     runs-on: ubuntu-latest
@@ -47,11 +45,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Download artifacts
         uses: actions/download-artifact@v8
+        with:
+          name: thunderstore-build
+          path: ./dist
       
       - name: Delete old release if it already exists
         run: gh release delete --yes "${RELEASE_VERSION}"
@@ -80,8 +79,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Download Thunderstore artifact
         uses: actions/download-artifact@v8
