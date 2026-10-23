@@ -71,10 +71,8 @@ namespace ShrineBag {
 			self.failureChance = rewarded ? -1f : 1f;
 
 			if(rewarded)
-				//Offset by one because it's set before orig
-				self.maxPurchaseCount = bagMarket.IsDepleted
-					? self.successfulPurchaseCount + 1
-					: self.successfulPurchaseCount + 2;
+				//Offset by +1 because it's set before orig increments successfulPurchaseCount
+				self.maxPurchaseCount = self.successfulPurchaseCount + (bagMarket.IsDepleted ? 1 : 2);
 
 			try {
 				origAddShrineStack(self, activator);
