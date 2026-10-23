@@ -40,7 +40,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="MinVer" Version="7.*">
+		<PackageReference Include="MinVer" Version="7.0.0">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
@@ -76,7 +76,7 @@
 		<Move SourceFiles="@(FilesToRename)" DestinationFiles="@(FilesToRename -&gt; Replace($(PlainVersion), $(MinVerVersion)))" />
 	</Target>
 
-	<Target Name="PublishThunderstoreArtifact" DependsOnTargets="PackageThunderstoreArtifact">
+	<Target Name="PublishThunderstoreArtifact" DependsOnTargets="SetPluginVersion">
 		<Exec Command="dotnet tcli publish --config-path $(ProjectDir)../thunderstore/thunderstore.toml --file $(ProjectDir)../dist/*-$(MinVerVersion).zip" />
 	</Target>
 </Project>
