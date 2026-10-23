@@ -9,12 +9,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ShrineBag {
-	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+	[BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
 	[BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
 	public sealed class Plugin: BaseUnityPlugin {
-		public const string PluginGuid = "com.papitaconpure.shrinebag";
-		public const string PluginName = "Shrine Bag";
-		public const string PluginVersion = BuildInfo.Version;
+		public const string PLUGIN_GUID = "com.papitaconpure.shrinebag";
+		public const string PLUGIN_NAME = "Shrine Bag";
+		public const string PLUGIN_VERSION = BuildInfo.Version;
 
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;
@@ -38,7 +38,7 @@ namespace ShrineBag {
 			On.RoR2.VehicleSeat.OnPassengerExit += VehicleSeat_OnPassengerExit;
 
 #if DEBUG
-			this.Logger.LogInfo($"{PluginName} {PluginVersion} loaded.");
+			this.Logger.LogInfo($"{PLUGIN_NAME} {PLUGIN_VERSION} loaded.");
 #endif
 		}
 
