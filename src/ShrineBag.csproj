@@ -3,31 +3,52 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<NoWarn>1701;1702;IDE0051;CS0436</NoWarn>
-		<AssemblyName>ShrineBag</AssemblyName>
 		<RootNamespace>ShrineBag</RootNamespace>
-		
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<SignAssembly>false</SignAssembly>
+
 		<RestoreAdditionalProjectSources>
 			https://api.nuget.org/v3/index.json;
 			https://nuget.bepinex.dev/v3/index.json
 		</RestoreAdditionalProjectSources>
-		
+
 		<EnableRiskOfOptions Condition="'$(EnableRiskOfOptions)' == ''">true</EnableRiskOfOptions>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>PapitaConPuré</Authors>
+		<AssemblyName>ShrineBag</AssemblyName>
+		<Product>Shrine Bag</Product>
+		<BepInExPluginGuid>com.papitaconpure.shrinebag</BepInExPluginGuid>
+		<RepositoryUrl>https://github.com/PapitaConPure/ShrineBag</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<FileVersion>$(Version)</FileVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(EnableRiskOfOptions)' == 'true'">
 		<DefineConstants>$(DefineConstants);RISK_OF_OPTIONS</DefineConstants>
 	</PropertyGroup>
+	
+	<PropertyGroup>
+		<MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
+		<MinVerTagPrefix>v</MinVerTagPrefix>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+		<PackageReference Include="BepInEx.Analyzers" Version="1.*">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="MinVer" Version="7.*">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
 		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
 		<PackageReference Include="MMHOOK.RoR2" Version="*" NoWarn="NU1701" />
-		<PackageReference Include="RiskOfRain2.GameLibs" Version="*-*" />
-		<PackageReference Include="RoR2BepInExPack" Version="*" />
+		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.*-*" />
+		<PackageReference Include="RoR2BepInExPack" Version="1.*" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(EnableRiskOfOptions)' == 'true'">
@@ -37,11 +58,25 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Assets\icon.png" LogicalName="ShrineBag.icon.png" />
 	</ItemGroup>
-	
-	<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile">
-		<WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs" Lines="&#xD;&#xA;namespace ShrineBag { internal static class BuildInfo { public const string Version = &quot;$(Version)&quot;%3B } }" Overwrite="true" />
+
+	<Target Name="SetPluginVersion" BeforeTargets="AddGeneratedFile" DependsOnTargets="MinVer">
+		<PropertyGroup>
+			<PlainVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</PlainVersion>
+			<BepInExPluginVersion>$(PlainVersion)</BepInExPluginVersion>
+		</PropertyGroup>
+	</Target>
+
+	<Target Name="PackageThunderstoreArtifact" DependsOnTargets="SetPluginVersion" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+		<Exec Command="dotnet tcli build --config-path $(ProjectDir)../thunderstore/thunderstore.toml --package-version $(PlainVersion)" />
+
 		<ItemGroup>
-			<Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
+			<FilesToRename Include="$(ProjectDir)../dist/*-$(PlainVersion).zip" />
 		</ItemGroup>
+
+		<Move SourceFiles="@(FilesToRename)" DestinationFiles="@(FilesToRename -&gt; Replace($(PlainVersion), $(MinVerVersion)))" />
+	</Target>
+
+	<Target Name="PublishThunderstoreArtifact" DependsOnTargets="SetPluginVersion">
+		<Exec Command="dotnet tcli publish --config-path $(ProjectDir)../thunderstore/thunderstore.toml --file $(ProjectDir)../dist/*-$(MinVerVersion).zip" />
 	</Target>
 </Project>
