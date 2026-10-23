@@ -13,6 +13,7 @@ containsNsfwContent = false
 
 [package.dependencies]
 bbepis-BepInExPack = "5.4.2113"
+RiskofThunder-HookGenPatcher = "1.2.4"
 
 [build]
 icon = "icons/roo-icon-static.png"
