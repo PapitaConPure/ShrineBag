@@ -2,6 +2,8 @@ using BepInEx;
 using BepInEx.Configuration;
 using RoR2;
 using ShrineBag.Settings;
+using ShrineBag.Testing;
+using ShrineBag.Utils;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -12,7 +14,7 @@ namespace ShrineBag {
 	public sealed class Plugin: BaseUnityPlugin {
 		public const string PluginGuid = "com.papitaconpure.shrinebag";
 		public const string PluginName = "Shrine Bag";
-		public const string PluginVersion = "1.1.0";
+		public const string PluginVersion = BuildInfo.Version;
 
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;

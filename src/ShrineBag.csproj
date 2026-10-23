@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<NoWarn>1701;1702;IDE0051;CS0436</NoWarn>
+		<AssemblyName>ShrineBag</AssemblyName>
+		<RootNamespace>ShrineBag</RootNamespace>
+		
+		<RestoreAdditionalProjectSources>
+			https://api.nuget.org/v3/index.json;
+			https://nuget.bepinex.dev/v3/index.json
+		</RestoreAdditionalProjectSources>
+		
+		<EnableRiskOfOptions Condition="'$(EnableRiskOfOptions)' == ''">true</EnableRiskOfOptions>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(EnableRiskOfOptions)' == 'true'">
+		<DefineConstants>$(DefineConstants);RISK_OF_OPTIONS</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
+		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+		<PackageReference Include="MMHOOK.RoR2" Version="*" NoWarn="NU1701" />
+		<PackageReference Include="RiskOfRain2.GameLibs" Version="*-*" />
+		<PackageReference Include="RoR2BepInExPack" Version="*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(EnableRiskOfOptions)' == 'true'">
+		<PackageReference Include="Rune580.Mods.RiskOfRain2.RiskOfOptions" Version="2.8.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\icon.png" LogicalName="ShrineBag.icon.png" />
+	</ItemGroup>
+	
+	<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile">
+		<WriteLinesToFile File="$(IntermediateOutputPath)BuildInfo.g.cs" Lines="&#xD;&#xA;namespace ShrineBag { internal static class BuildInfo { public const string Version = &quot;$(Version)&quot;%3B } }" Overwrite="true" />
+		<ItemGroup>
+			<Compile Include="$(IntermediateOutputPath)BuildInfo.g.cs" />
+		</ItemGroup>
+	</Target>
+</Project>

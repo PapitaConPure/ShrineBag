@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace ShrineBag {
+namespace ShrineBag.Utils {
 	internal static class ModIcon {
 		public static Sprite Load() {
 			using Stream stream = Assembly.GetExecutingAssembly()

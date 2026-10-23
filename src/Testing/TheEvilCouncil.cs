@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
-namespace ShrineBag {
+namespace ShrineBag.Testing {
 	//We don't use the Director for tihs
 	internal static class TheEvilCouncil {
 		private const float COUNCIL_MIN_DISTANCE = 5f;
