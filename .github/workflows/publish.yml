@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -67,7 +69,7 @@ jobs:
             -f tag_name="${RELEASE_VERSION}" \
             --jq ".body" > "${CHANGELOG_FILE}"
           cat "${CHANGELOG_FILE}"
-          gh release create "${RELEASE_VERSION}" -F "${CHANGELOG_FILE}" thunderstore-build/*.zip
+          gh release create "${RELEASE_VERSION}" -F "${CHANGELOG_FILE}" ./dist/*.zip
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,6 +86,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: thunderstore-build
+          path: ./dist
       
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -97,4 +100,6 @@ jobs:
         env:
           TCLI_AUTH_TOKEN: ${{ secrets.THUNDERSTORE_TOKEN }}
         run: |
-          dotnet build -target:PublishThunderstoreArtifact
+          ZIP_FILE=$(ls ./dist/*.zip | head -n 1)
+          echo "Publishing: $ZIP_FILE"
+          dotnet tcli publish --config-path ./thunderstore/thunderstore.toml --file "$ZIP_FILE"
