@@ -1,3 +1,6 @@
+### v1.1.2
+* Fix the whole mod apparently not fucking working because I deleted a seemingly inoffensive line!!!!!!!!!!!!! (did I actually fix it tell me I did please please please it worked on my machine)
+
 ### v1.1.1
 * Removed some internal unused build stuff hopefully nothing breaks please please please.
 * Fixed and improved README again.
