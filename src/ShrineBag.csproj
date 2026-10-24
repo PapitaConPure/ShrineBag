@@ -65,4 +65,14 @@
 			<BepInExPluginVersion>$(PlainVersion)</BepInExPluginVersion>
 		</PropertyGroup>
 	</Target>
+
+	<Target Name="PackageThunderstoreArtifact" DependsOnTargets="SetPluginVersion" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+		<Exec Command="dotnet tcli build --config-path $(ProjectDir)../thunderstore/thunderstore.toml --package-version $(PlainVersion)" />
+
+		<ItemGroup>
+			<FilesToRename Include="$(ProjectDir)../dist/*-$(PlainVersion).zip" />
+		</ItemGroup>
+
+		<Move SourceFiles="@(FilesToRename)" DestinationFiles="@(FilesToRename -&gt; Replace($(PlainVersion), $(MinVerVersion)))" />
+	</Target>
 </Project>
