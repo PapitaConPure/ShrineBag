@@ -2,8 +2,9 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>latest</LangVersion>
-		<NoWarn>1701;1702;IDE0051;CS0436</NoWarn>
 		<RootNamespace>ShrineBag</RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<NoWarn>1701;1702;IDE0051;CS0436</NoWarn>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SignAssembly>false</SignAssembly>
 
@@ -36,7 +37,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Analyzers" Version="1.*">
+		<PackageReference Include="BepInEx.Analyzers" Version="1.0.*">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -47,8 +48,8 @@
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
 		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
 		<PackageReference Include="MMHOOK.RoR2" Version="*" NoWarn="NU1701" />
-		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.*-*" />
-		<PackageReference Include="RoR2BepInExPack" Version="1.*" />
+		<PackageReference Include="RiskOfRain2.GameLibs" Version="*-*" />
+		<PackageReference Include="RoR2BepInExPack" Version="*" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(EnableRiskOfOptions)' == 'true'">
