@@ -68,13 +68,20 @@
 			defaultValue: true);
 
 		public static readonly ConstrainedEntry<float, RangeEntryConstraint<float>> CreditsFactor = new(
-			section: "General",
+			section: "Balancing",
 			name: "Credit Cost Multiplier",
 			description: Paragraph(
 				"You can scale the spawn cost of each shrine by a factor in relation to vanilla.",
-				"This may help with balance but it's usually better left untouched.",
-				"",
-				"By the way, I didn't actually test this works. Whoops! Default should tho."),
+				"This may help with balance but it's usually better left untouched."),
+			defaultValue: 1f,
+			constraint: new(Min: 0.1f, Max: 8f));
+
+		public static readonly ConstrainedEntry<float, RangeEntryConstraint<float>> WeightFactor = new(
+			section: "Balancing",
+			name: "Weight Multiplier",
+			description: Paragraph(
+				"You can scale the weight (likelihood of being chosen over another interactable) of the shrines by a factor in relation to vanilla.",
+				"This may help with balance but it's usually better left untouched."),
 			defaultValue: 1f,
 			constraint: new(Min: 0.1f, Max: 8f));
 

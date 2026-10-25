@@ -18,9 +18,13 @@ namespace ShrineBag {
 		internal static ConfigEntry<ModSettings.BagGenModeKey> BagGenMode;
 		internal static ConfigEntry<int> BagGenCount;
 		internal static ConfigEntry<bool> OnlyTrimLast;
+
 		internal static ConfigEntry<float> CreditsFactor;
+		internal static ConfigEntry<float> WeightFactor;
+
 		internal static ConfigEntry<bool> CouncilEnabled;
 		internal static ConfigEntry<int> CouncilSize;
+
 		internal static ConfigEntry<bool> Megumin;
 
 		private static ShrineChanceSpawnCardManager shrineChanceSpawnCardManager;
@@ -90,7 +94,7 @@ namespace ShrineBag {
 
 			shrineChanceSpawnCardManager ??= new();
 
-			if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f))
+			if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f, 0.01f))
 				shrineChanceSpawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
 			else if(shrineChanceSpawnCardManager.Initialized)
 				shrineChanceSpawnCardManager.ResetCreditCost();
@@ -114,13 +118,15 @@ namespace ShrineBag {
 		}
 
 		private void RegisterSettings() {
-			Enabled       = ModSettings.Enabled.RegisterFor(this);
-			RewardCount   = ModSettings.RewardCount.RegisterFor(this);
-			FailureCount  = ModSettings.FailureCount.RegisterFor(this);
-			BagGenMode    = ModSettings.BagGenMode.RegisterFor(this);
-			BagGenCount   = ModSettings.BagGenCount.RegisterFor(this);
-			OnlyTrimLast  = ModSettings.OnlyTrimLastBag.RegisterFor(this);
+			Enabled      = ModSettings.Enabled.RegisterFor(this);
+			RewardCount  = ModSettings.RewardCount.RegisterFor(this);
+			FailureCount = ModSettings.FailureCount.RegisterFor(this);
+			BagGenMode   = ModSettings.BagGenMode.RegisterFor(this);
+			BagGenCount  = ModSettings.BagGenCount.RegisterFor(this);
+			OnlyTrimLast = ModSettings.OnlyTrimLastBag.RegisterFor(this);
+
 			CreditsFactor = ModSettings.CreditsFactor.RegisterFor(this);
+			WeightFactor  = ModSettings.WeightFactor.RegisterFor(this);
 
 			CouncilEnabled = ModSettings.CouncilEnabled.RegisterFor(this);
 			CouncilSize    = ModSettings.CouncilSize.RegisterFor(this);
@@ -143,7 +149,9 @@ namespace ShrineBag {
 				ModSettingsManagerCompat.AddChoiceOption(BagGenMode);
 				ModSettingsManagerCompat.AddSliderOption(BagGenCount);
 				ModSettingsManagerCompat.AddCheckboxOption(OnlyTrimLast);
+
 				ModSettingsManagerCompat.AddSliderOption(CreditsFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
+				ModSettingsManagerCompat.AddSliderOption(WeightFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
 
 				ModSettingsManagerCompat.AddCheckboxOption(CouncilEnabled);
 				ModSettingsManagerCompat.AddSliderOption(CouncilSize);
