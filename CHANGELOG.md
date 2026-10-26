@@ -1,5 +1,14 @@
+### v1.2.0
+* Added an indicator that only the host needs the mod for things to work in multiplayer. Both internally and in the README.
+* Added "Weight Multiplier" setting.
+* The "Credit Cost Multiplier" setting should actually work now.
+* Added "Balancing" settings section for cost and weight multipliers + a better explanation.
+* Simplified README "Features" section and documented new setting and settings section.
+* Small fixes here and there. We love those.
+* Now depends on R2API Core.
+
 ### v1.1.2
-* Fix the whole mod apparently not fucking working because I deleted a seemingly inoffensive line!!!!!!!!!!!!! (did I actually fix it tell me I did please please please it worked on my machine)
+* Fix the whole mod not working because of a single line!!!!!!!!!!
 
 ### v1.1.1
 * Removed some internal unused build stuff hopefully nothing breaks please please please.
@@ -9,6 +18,7 @@
 * Added configurable amount and trimming of bags per shrine.
 * Added Stage Director "Credit Cost Multiplier" option.
 * Added ***'The Council'*** for testing (EVIL).
+* Now properly lists HookGenPatcher as a dependency, as it should have since the beginning.
 
 ### v1.0.2
 * Fixed some README things. Nothing ever happens.
