@@ -14,7 +14,7 @@ containsNsfwContent = false
 [package.dependencies]
 bbepis-BepInExPack = "5.4.2122"
 RiskofThunder-HookGenPatcher = "1.2.4"
-tristanmcpherson-R2API = "5.0.5"
+RiskofThunder-R2API_Core = "5.3.0"
 
 [build]
 icon = "./icon.png"
