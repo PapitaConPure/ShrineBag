@@ -47,6 +47,7 @@
 		</PackageReference>
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
 		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+		<PackageReference Include="R2API.Core" Version="5.3.0" />
 		<PackageReference Include="MMHOOK.RoR2" Version="*" NoWarn="NU1701" />
 		<PackageReference Include="RiskOfRain2.GameLibs" Version="*-*" />
 		<PackageReference Include="RoR2BepInExPack" Version="*" />
