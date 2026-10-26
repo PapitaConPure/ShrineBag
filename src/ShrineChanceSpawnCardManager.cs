@@ -10,7 +10,6 @@ namespace ShrineBag {
 	internal sealed class ShrineChanceSpawnCardManager {
 		private bool initialized;
 		private int originalCreditCost;
-		private int originalWeight;
 		private InteractableSpawnCard spawnCard;
 
 		public bool Initialized => this.initialized;
@@ -19,52 +18,37 @@ namespace ShrineBag {
 		/// Sets the credit cost of the Shrine of Chance's Spawn Card relative to a factor of its original cost.
 		/// </summary>
 		/// <param name="configuredFactor">The factor used to compute the final credit cost of the interactable's SpawnCard.</param>
-		public ShrineChanceSpawnCardManager ApplyCreditCostFactor(float configuredFactor) {
+		public void ApplyCreditCostFactor(float configuredFactor) {
 			if(!this.initialized)
 				this.Initialize();
 
 			float factor = ModSettings.CreditsFactor.Constraint.Clamp(configuredFactor);
 			this.spawnCard.directorCreditCost = (int)MathF.Round(this.originalCreditCost * factor);
-
-			return this;
 		}
 
 		/// <summary>
-		/// Sets the weight of the Shrine of Chance's Spawn Card relative to a factor of its original cost.
+		/// Sets the weight of the Shrine of Chance's Spawn Card relative to a factor of the original weight on the Director's selection.
 		/// </summary>
+		/// <remarks>Non-reversible (shouldn't matter).</remarks>
+		/// <param name="directorWeights">The result of the original function that generates the Director's choices.</param>
 		/// <param name="configuredFactor">The factor used to compute the final weight of the interactable's Spawn Card.</param>
-		public ShrineChanceSpawnCardManager ApplyWeightFactor(float configuredFactor) {
+		public void ApplyWeightFactor(WeightedSelection<DirectorCard> directorWeights, float configuredFactor) {
 			if(!this.initialized)
 				this.Initialize();
 
+			int choiceIndex = this.FindCardChoice(directorWeights, out WeightedSelection<DirectorCard>.ChoiceInfo choice);
 			float factor = ModSettings.WeightFactor.Constraint.Clamp(configuredFactor);
-			//FIXME: how? | this.spawnCard.weightOrShit = (int)MathF.Round(this.originalWeight * factor);
-
-			return this;
+			directorWeights.ModifyChoiceWeight(choiceIndex, choice.weight * factor);
 		}
 
 		/// <summary>
 		/// Resets the credit cost of the Shrine of Chance's Spawn Card to the originally perceived value.
 		/// </summary>
-		internal ShrineChanceSpawnCardManager ResetCreditCost() {
+		internal void ResetCreditCost() {
 			if(!this.initialized)
 				this.Initialize();
 
 			this.spawnCard.directorCreditCost = this.originalCreditCost;
-
-			return this;
-		}
-
-		/// <summary>
-		/// Resets the weight of the Shrine of Chance's Spawn Card to the originally perceived value.
-		/// </summary>
-		internal ShrineChanceSpawnCardManager ResetWeight() {
-			if(!this.initialized)
-				this.Initialize();
-
-			//FIXME: how? | this.spawnCard.weightOrShit = this.originalWeight;
-
-			return this;
 		}
 
 		/// <summary>
@@ -78,9 +62,27 @@ namespace ShrineBag {
 				);
 
 			this.originalCreditCost = spawnCard.directorCreditCost;
-			//FIXME: how? | this.originalWeight = spawnCard.weightOrShit;
 			this.spawnCard = spawnCard;
 			this.initialized = true;
+		}
+
+		/// <summary>
+		/// Shit fuck.
+		/// </summary>
+		/// <param name="directorWeights"></param>
+		/// <param name="choice"></param>
+		/// <returns></returns>
+		/// <exception cref="InvalidOperationException"></exception>
+		private int FindCardChoice(WeightedSelection<DirectorCard> directorWeights, out WeightedSelection<DirectorCard>.ChoiceInfo choice) {
+			for(int i = 0; i < directorWeights.Count; i++) {
+				WeightedSelection<DirectorCard>.ChoiceInfo c = directorWeights.GetChoice(i);
+				if(c.value.spawnCard == this.spawnCard) {
+					choice = c;
+					return i;
+				}
+			}
+
+			throw new InvalidOperationException("Failed to find the ChoiceInfo associated to this manager's Spawn Card within the supplied WeightedSelection.");
 		}
 	}
 }

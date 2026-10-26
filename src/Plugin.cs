@@ -35,6 +35,7 @@ namespace ShrineBag {
 
 			On.RoR2.ShrineChanceBehavior.AddShrineStack += ShrineChanceBehavior_AddShrineStack;
 			On.RoR2.SceneDirector.PopulateScene += SceneDirector_PopulateScene;
+			On.RoR2.SceneDirector.GenerateInteractableCardSelection += SceneDirector_GenerateInteractableCardSelection;
 			On.RoR2.VehicleSeat.OnPassengerExit += VehicleSeat_OnPassengerExit;
 
 #if DEBUG
@@ -45,6 +46,7 @@ namespace ShrineBag {
 		public void OnDestroy() {
 			On.RoR2.ShrineChanceBehavior.AddShrineStack -= ShrineChanceBehavior_AddShrineStack;
 			On.RoR2.SceneDirector.PopulateScene -= SceneDirector_PopulateScene;
+			On.RoR2.SceneDirector.GenerateInteractableCardSelection -= SceneDirector_GenerateInteractableCardSelection;
 			On.RoR2.VehicleSeat.OnPassengerExit -= VehicleSeat_OnPassengerExit;
 		}
 
@@ -83,7 +85,22 @@ namespace ShrineBag {
 			}
 		}
 
-		//Could just set the credit cost in Awake, but config change would require a restart
+		private static WeightedSelection<DirectorCard> SceneDirector_GenerateInteractableCardSelection(
+			On.RoR2.SceneDirector.orig_GenerateInteractableCardSelection origGenerateInteractableCardSelection,
+			SceneDirector self) {
+			if(!NetworkServer.active)
+				return null;
+
+			WeightedSelection<DirectorCard> directorWeights = origGenerateInteractableCardSelection(self);
+
+			if(self != null && Enabled.Value && !WeightFactor.Value.AboutEquals(1f, 0.01f)) {
+				shrineChanceSpawnCardManager ??= new();
+				shrineChanceSpawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
+			}
+
+			return directorWeights;
+		}
+
 		private static void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene origPopulateScene, SceneDirector self) {
 			if(!NetworkServer.active || self == null) {
 				origPopulateScene(self);
@@ -94,14 +111,10 @@ namespace ShrineBag {
 
 			shrineChanceSpawnCardManager ??= new();
 
-			if(Enabled.Value && (!CreditsFactor.Value.AboutEquals(1f, 0.01f) || !WeightFactor.Value.AboutEquals(1f, 0.01f)))
-				shrineChanceSpawnCardManager
-					.ApplyCreditCostFactor(CreditsFactor.Value)
-					.ApplyWeightFactor(WeightFactor.Value);
+			if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f, 0.01f))
+				shrineChanceSpawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
 			else if(shrineChanceSpawnCardManager.Initialized)
-				shrineChanceSpawnCardManager
-					.ResetCreditCost()
-					.ResetWeight();
+				shrineChanceSpawnCardManager.ResetCreditCost();
 
 			origPopulateScene(self);
 		}
