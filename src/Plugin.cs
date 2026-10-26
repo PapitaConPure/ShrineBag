@@ -34,7 +34,7 @@ namespace ShrineBag {
 			this.TryRegisterRiskOfOptions();
 
 			On.RoR2.ShrineChanceBehavior.AddShrineStack += ShrineChanceBehavior_AddShrineStack;
-			On.RoR2.SceneDirector.Start += SceneDirector_Start;
+			On.RoR2.SceneDirector.PopulateScene += SceneDirector_PopulateScene;
 			On.RoR2.VehicleSeat.OnPassengerExit += VehicleSeat_OnPassengerExit;
 
 #if DEBUG
@@ -44,7 +44,7 @@ namespace ShrineBag {
 
 		public void OnDestroy() {
 			On.RoR2.ShrineChanceBehavior.AddShrineStack -= ShrineChanceBehavior_AddShrineStack;
-			On.RoR2.SceneDirector.Start -= SceneDirector_Start;
+			On.RoR2.SceneDirector.PopulateScene -= SceneDirector_PopulateScene;
 			On.RoR2.VehicleSeat.OnPassengerExit -= VehicleSeat_OnPassengerExit;
 		}
 
@@ -84,9 +84,9 @@ namespace ShrineBag {
 		}
 
 		//Could just set the credit cost in Awake, but config change would require a restart
-		private static void SceneDirector_Start(On.RoR2.SceneDirector.orig_Start origStart, SceneDirector self) {
+		private static void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene origPopulateScene, SceneDirector self) {
 			if(!NetworkServer.active || self == null) {
-				origStart(self);
+				origPopulateScene(self);
 				return;
 			}
 
@@ -99,9 +99,11 @@ namespace ShrineBag {
 					.ApplyCreditCostFactor(CreditsFactor.Value)
 					.ApplyWeightFactor(WeightFactor.Value);
 			else if(shrineChanceSpawnCardManager.Initialized)
-				shrineChanceSpawnCardManager.ResetCreditCost();
+				shrineChanceSpawnCardManager
+					.ResetCreditCost()
+					.ResetWeight();
 
-			origStart(self);
+			origPopulateScene(self);
 		}
 
 		private static void VehicleSeat_OnPassengerExit(On.RoR2.VehicleSeat.orig_OnPassengerExit origOnPassengerExit, VehicleSeat self, GameObject passenger) {
