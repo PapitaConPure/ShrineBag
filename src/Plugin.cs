@@ -1,5 +1,6 @@
 using BepInEx;
 using BepInEx.Configuration;
+using R2API.Utils;
 using RoR2;
 using ShrineBag.Settings;
 using ShrineBag.Testing;
@@ -10,6 +11,7 @@ using UnityEngine.Networking;
 
 namespace ShrineBag {
 	[BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+	[NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
 	[BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
 	public sealed class Plugin: BaseUnityPlugin {
 		internal static ConfigEntry<bool> Enabled;
