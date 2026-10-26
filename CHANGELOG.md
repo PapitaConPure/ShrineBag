@@ -1,3 +1,6 @@
+###v1.2.1
+* Fixed the balancing settings for real this time.
+
 ### v1.2.0
 * Added an indicator that only the host needs the mod for things to work in multiplayer. Both internally and in the README.
 * Added "Weight Multiplier" setting.
