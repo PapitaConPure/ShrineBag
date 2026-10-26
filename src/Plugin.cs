@@ -48,6 +48,9 @@ namespace ShrineBag {
 			On.RoR2.SceneDirector.PopulateScene -= SceneDirector_PopulateScene;
 			On.RoR2.SceneDirector.GenerateInteractableCardSelection -= SceneDirector_GenerateInteractableCardSelection;
 			On.RoR2.VehicleSeat.OnPassengerExit -= VehicleSeat_OnPassengerExit;
+
+			if(shrineChanceSpawnCardManager?.Initialized == true)
+				shrineChanceSpawnCardManager.ResetCreditCost();
 		}
 
 		private static void ShrineChanceBehavior_AddShrineStack(
@@ -88,15 +91,13 @@ namespace ShrineBag {
 		private static WeightedSelection<DirectorCard> SceneDirector_GenerateInteractableCardSelection(
 			On.RoR2.SceneDirector.orig_GenerateInteractableCardSelection origGenerateInteractableCardSelection,
 			SceneDirector self) {
-			if(!NetworkServer.active)
-				return null;
-
 			WeightedSelection<DirectorCard> directorWeights = origGenerateInteractableCardSelection(self);
 
-			if(self != null && Enabled.Value && !WeightFactor.Value.AboutEquals(1f, 0.01f)) {
-				shrineChanceSpawnCardManager ??= new();
-				shrineChanceSpawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
-			}
+			if(!NetworkServer.active || self == null || !Enabled.Value || WeightFactor.Value.AboutEquals(1f, 0.01f))
+				return directorWeights;
+
+			shrineChanceSpawnCardManager ??= new();
+			shrineChanceSpawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
 
 			return directorWeights;
 		}
@@ -122,7 +123,7 @@ namespace ShrineBag {
 		private static void VehicleSeat_OnPassengerExit(On.RoR2.VehicleSeat.orig_OnPassengerExit origOnPassengerExit, VehicleSeat self, GameObject passenger) {
 			origOnPassengerExit(self, passenger);
 
-			if(!NetworkServer.active || self == null || !Enabled.Value)
+			if(!NetworkServer.active || self == null || passenger == null || !Enabled.Value)
 				return;
 
 			if(!self.currentPassengerBody.isPlayerControlled || Run.instance.stageClearCount != 0)
