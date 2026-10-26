@@ -1,15 +1,14 @@
 # Shrine Bag
-Makes Shrines of Chance pick from a finite bag of outcomes instead of being able to fail forever.
+Makes Shrines of Chance pick from a finite, shuffled bag of outcomes instead of being able to fail forever.
 
-I made this mod because my luck sucks and the vanilla behavior sucks even more. The default values are what I personally use.
+I made this mod because my luck sucks and the vanilla behavior sucks even more. It's server-side, but only the host needs the mod. The default values are what I personally use.
 
 ## Features
-* Each shrine gets its own finite, shuffled bag of outcomes. The amount of bags per shrine is configurable.
+* Each shrine gets its own finite, shuffled bag of outcomes. The outcomes are consumed one by one as you pray. The number of bags per shrine is configurable.
 * Each bag contains 2 *'reward'* outcomes (configurable) and 4 *'failure'* outcomes (configurable). The bags are shuffled independently.
-* Vanilla reward/failure logic remains pretty much untouched. The mod forces the failure chance after a shrine takes an outcome from its bag and updates the maximum purchases to match the configured total rewards. Compatibility should be pretty good.
-* After the last bag is exhausted, that shrine remains unavailable even if you don't hit the vanilla reward limit of 2. Likewise, if the configured number of rewards surpasses that of vanilla, the Shrine will remain active until all its bags are empty.
-* A shrine's last bag will get preemptively discarded if only *'failure'* outcomes remain.
-* If you so desire, you can multiply the credit cost of spawning the shrine in relation to vanilla for balancing.
+* A shrine's last bag will get preemptively discarded if only *'failure'* outcomes remain. Bags other than the last can also get "trimmed" (configurable).
+* Credit cost and weight multipliers in relation to vanilla for balancing (configurable).
+* Internally forces vanilla reward/failure chance, so mod compatibility should be pretty good.
 
 ## Configuration
 ### General
@@ -21,7 +20,6 @@ I made this mod because my luck sucks and the vanilla behavior sucks even more. 
 | Bag Gen. Mode          | Choice  | Exact   | The method used to generate bags. Works together with "Bag Gen. Count" |
 | Bag Gen. Count         | Integer | `1`     | Number of bags used by the generation mode. |
 | Only Trim Last Bag     | Toggle  | On      | When enabled, only the final bag of a shrine is trimmed. When disabled, every bag is. |
-| Credit Cost Multiplier | Factor  | `1.0`   | By how much should the mod multiply the credits required by the stage director to spawn a Shrine of Chance. For balance purposes, although usually better left untouched. |
 
 For context: the default behavior of 2 rewards vs. 4 failures makes each bag have 6 outcomes in total. This means that the worst-case scenario consists of 6 purchases: 4 failures first and then 2 rewards. The best-case scenario would still be 2 rewards up front.
 
@@ -39,6 +37,17 @@ The "Only Trim Last Bag" setting is only relevant when you configure multiple ba
 * **Off:** Trims every bag. Makes in-between bags that would otherwise end with one or more failures smaller.
 
 When "Bag Gen. Mode" is set to **Infinite**, "Only Trim Last Bag" determines if trimming happens at all, as there is no last bag there.
+
+### Balancing
+| Name                   | Type    | Default | Description |
+|------------------------|---------|---------|-------------|     
+| Credit Cost Multiplier | Factor  | `1.0`   | By how much should the credits required by the Stage Director to spawn a Shrine of Chance be multiplied. Vanilla is `x1`. |
+| Weight Multiplier      | Factor  | `1.0`   | By how much should the weight used by the Stage Director be multiplied. A higher weight means the shrine is more likely to spawn over other interactables. Vanilla is `x1`. |
+
+These settings exist for balance purposes, although they're usually better left untouched unless you use some pretty wild settings.
+
+#### Stage Director
+At the start of each stage, a "Stage Director" is put in charge of spawning all the interactables. For this, the director will spend as much of its budget as possible ("credits"). The interactables are chosen randomly, but some have a higher/lower "weight", meaning they'll get selected more/less often for spawning.
 
 ### Testing
 | Name                   | Type    | Default | Description |
