@@ -1,3 +1,6 @@
+### v1.2.2
+* Reduce mod size to tiny levels by casting some color quantization spells upon the dummy fat PNG icons.
+
 ### v1.2.1
 * Fixed the balancing settings for real this time.
 
