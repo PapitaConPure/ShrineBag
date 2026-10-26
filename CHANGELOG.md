@@ -1,4 +1,4 @@
-###v1.2.1
+### v1.2.1
 * Fixed the balancing settings for real this time.
 
 ### v1.2.0
