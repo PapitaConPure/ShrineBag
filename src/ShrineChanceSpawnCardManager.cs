@@ -10,6 +10,7 @@ namespace ShrineBag {
 	internal sealed class ShrineChanceSpawnCardManager {
 		private bool initialized;
 		private int originalCreditCost;
+		private int originalWeight;
 		private InteractableSpawnCard spawnCard;
 
 		public bool Initialized => this.initialized;
@@ -37,20 +38,31 @@ namespace ShrineBag {
 				this.Initialize();
 
 			float factor = ModSettings.WeightFactor.Constraint.Clamp(configuredFactor);
-			this.spawnCard.directorCreditCost = (int)MathF.Round(this.originalCreditCost * factor);
+			//FIXME: how? | this.spawnCard.weightOrShit = (int)MathF.Round(this.originalWeight * factor);
 
 			return this;
 		}
 
 		/// <summary>
 		/// Resets the credit cost of the Shrine of Chance's Spawn Card to the originally perceived value.
-		/// I actually have no idea if this might break things anyway or not.
 		/// </summary>
 		internal ShrineChanceSpawnCardManager ResetCreditCost() {
 			if(!this.initialized)
 				this.Initialize();
 
 			this.spawnCard.directorCreditCost = this.originalCreditCost;
+
+			return this;
+		}
+
+		/// <summary>
+		/// Resets the weight of the Shrine of Chance's Spawn Card to the originally perceived value.
+		/// </summary>
+		internal ShrineChanceSpawnCardManager ResetWeight() {
+			if(!this.initialized)
+				this.Initialize();
+
+			//FIXME: how? | this.spawnCard.weightOrShit = this.originalWeight;
 
 			return this;
 		}
@@ -66,6 +78,7 @@ namespace ShrineBag {
 				);
 
 			this.originalCreditCost = spawnCard.directorCreditCost;
+			//FIXME: how? | this.originalWeight = spawnCard.weightOrShit;
 			this.spawnCard = spawnCard;
 			this.initialized = true;
 		}
