@@ -94,8 +94,10 @@ namespace ShrineBag {
 
 			shrineChanceSpawnCardManager ??= new();
 
-			if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f, 0.01f))
-				shrineChanceSpawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
+			if(Enabled.Value && (!CreditsFactor.Value.AboutEquals(1f, 0.01f) || !WeightFactor.Value.AboutEquals(1f, 0.01f)))
+				shrineChanceSpawnCardManager
+					.ApplyCreditCostFactor(CreditsFactor.Value)
+					.ApplyWeightFactor(WeightFactor.Value);
 			else if(shrineChanceSpawnCardManager.Initialized)
 				shrineChanceSpawnCardManager.ResetCreditCost();
 
