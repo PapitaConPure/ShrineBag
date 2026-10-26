@@ -29,8 +29,6 @@ namespace ShrineBag {
 
 		internal static ConfigEntry<bool> Megumin;
 
-		private static ShrineChanceSpawnCardManager shrineChanceSpawnCardManager;
-
 		public void Awake() {
 			this.RegisterSettings();
 			this.TryRegisterRiskOfOptions();
@@ -50,9 +48,6 @@ namespace ShrineBag {
 			On.RoR2.SceneDirector.PopulateScene -= SceneDirector_PopulateScene;
 			On.RoR2.SceneDirector.GenerateInteractableCardSelection -= SceneDirector_GenerateInteractableCardSelection;
 			On.RoR2.VehicleSeat.OnPassengerExit -= VehicleSeat_OnPassengerExit;
-
-			if(shrineChanceSpawnCardManager?.Initialized == true)
-				shrineChanceSpawnCardManager.ResetCreditCost();
 		}
 
 		private static void ShrineChanceBehavior_AddShrineStack(
@@ -64,7 +59,8 @@ namespace ShrineBag {
 				return;
 			}
 
-			ShrineChanceBagMarket bagMarket = self.GetComponent<ShrineChanceBagMarket>() ?? self.gameObject.AddComponent<ShrineChanceBagMarket>();
+			ShrineChanceBagMarket bagMarket = self.GetComponent<ShrineChanceBagMarket>()
+				?? self.gameObject.AddComponent<ShrineChanceBagMarket>();
 
 			if(!bagMarket.TryGetUsableBag(RewardCount.Value, FailureCount.Value, BagGenMode.Value, BagGenCount.Value, OnlyTrimLast.Value, out ShrineChanceBag bag)
 			|| !bag.TryDraw(out bool rewarded)) {
@@ -98,8 +94,10 @@ namespace ShrineBag {
 			if(!NetworkServer.active || self == null || !Enabled.Value || WeightFactor.Value.AboutEquals(1f, 0.01f))
 				return directorWeights;
 
-			shrineChanceSpawnCardManager ??= new();
-			shrineChanceSpawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
+			ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
+				?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
+
+			spawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
 
 			return directorWeights;
 		}
@@ -112,12 +110,13 @@ namespace ShrineBag {
 
 			TheEvilCouncil.Prepare();
 
-			shrineChanceSpawnCardManager ??= new();
+			ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
+				?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
 
 			if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f, 0.01f))
-				shrineChanceSpawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
-			else if(shrineChanceSpawnCardManager.Initialized)
-				shrineChanceSpawnCardManager.ResetCreditCost();
+				spawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
+			else if(spawnCardManager.Initialized)
+				spawnCardManager.ResetCreditCost();
 
 			origPopulateScene(self);
 		}

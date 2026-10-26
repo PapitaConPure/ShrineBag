@@ -1,18 +1,24 @@
 ﻿using RoR2;
 using ShrineBag.Settings;
 using System;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace ShrineBag {
 	/// <summary>
 	/// Represents a reduced Shrine of Chance Interactable Spawn Card (IRC) Manager
 	/// </summary>
-	internal sealed class ShrineChanceSpawnCardManager {
+	internal sealed class ShrineChanceSpawnCardManager: MonoBehaviour {
 		private bool initialized;
 		private int originalCreditCost;
 		private InteractableSpawnCard spawnCard;
 
 		public bool Initialized => this.initialized;
+
+		public void OnDestroy() {
+			if(this.Initialized)
+				this.ResetCreditCost();
+		}
 
 		/// <summary>
 		/// Sets the credit cost of the Shrine of Chance's Spawn Card relative to a factor of its original cost.
