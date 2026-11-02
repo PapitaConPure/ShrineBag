@@ -91,13 +91,19 @@ namespace ShrineBag {
 			SceneDirector self) {
 			WeightedSelection<DirectorCard> directorWeights = origGenerateInteractableCardSelection(self);
 
-			if(!NetworkServer.active || self == null || !Enabled.Value || WeightFactor.Value.AboutEquals(1f, 0.01f))
+			if(!NetworkServer.active || self == null || directorWeights == null || !Enabled.Value || WeightFactor.Value.AboutEquals(1f, 0.01f))
 				return directorWeights;
 
 			ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
 				?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
 
-			spawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
+			try {
+				spawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
+			} catch(Exception ex) {
+				this.Logger.LogWarning($"Couldn't apply Shrine of Chance Spawn Card weight factor: {ex}"+
+					$"\nGot WeightedSelection of size {directorWeights.Count} with the following Spawn Cards:" +
+					$"\n* {string.Join("\n* ", directorWeights.choices)}");
+			}
 
 			return directorWeights;
 		}
