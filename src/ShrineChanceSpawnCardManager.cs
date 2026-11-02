@@ -88,7 +88,8 @@ namespace ShrineBag {
 				}
 			}
 
-			throw new InvalidOperationException("Failed to find the ChoiceInfo associated to this manager's Spawn Card within the supplied WeightedSelection.");
+			throw new InvalidOperationException("Failed to find the ChoiceInfo associated to this manager's Spawn Card within the supplied WeightedSelection." +
+				$"\nthis.spawnCard={this.spawnCard}");
 		}
 	}
 }

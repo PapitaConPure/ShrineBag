@@ -100,9 +100,8 @@ namespace ShrineBag {
 			try {
 				spawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
 			} catch(Exception ex) {
-				this.Logger.LogWarning($"Couldn't apply Shrine of Chance Spawn Card weight factor: {ex}"+
-					$"\nGot WeightedSelection of size {directorWeights.Count} with the following Spawn Cards:" +
-					$"\n* {string.Join("\n* ", directorWeights.choices)}");
+				this.Logger.LogWarning($"Couldn't apply Shrine of Chance Spawn Card weight factor: {ex}"
+					+ $"\nGot WeightedSelection with {directorWeights.Count} Spawn Cards.");
 			}
 
 			return directorWeights;
