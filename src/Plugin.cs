@@ -33,10 +33,10 @@ namespace ShrineBag {
 			this.RegisterSettings();
 			this.TryRegisterRiskOfOptions();
 
-			On.RoR2.ShrineChanceBehavior.AddShrineStack += ShrineChanceBehavior_AddShrineStack;
-			On.RoR2.SceneDirector.PopulateScene += SceneDirector_PopulateScene;
-			On.RoR2.SceneDirector.GenerateInteractableCardSelection += SceneDirector_GenerateInteractableCardSelection;
-			On.RoR2.VehicleSeat.OnPassengerExit += VehicleSeat_OnPassengerExit;
+			On.RoR2.ShrineChanceBehavior.AddShrineStack += this.ShrineChanceBehavior_AddShrineStack;
+			On.RoR2.SceneDirector.PopulateScene += this.SceneDirector_PopulateScene;
+			On.RoR2.SceneDirector.GenerateInteractableCardSelection += this.SceneDirector_GenerateInteractableCardSelection;
+			On.RoR2.VehicleSeat.OnPassengerExit += this.VehicleSeat_OnPassengerExit;
 
 #if DEBUG
 			this.Logger.LogInfo($"{PluginInfo.PLUGIN_NAME} {PluginInfo.PLUGIN_VERSION} loaded.");
@@ -44,13 +44,13 @@ namespace ShrineBag {
 		}
 
 		public void OnDestroy() {
-			On.RoR2.ShrineChanceBehavior.AddShrineStack -= ShrineChanceBehavior_AddShrineStack;
-			On.RoR2.SceneDirector.PopulateScene -= SceneDirector_PopulateScene;
-			On.RoR2.SceneDirector.GenerateInteractableCardSelection -= SceneDirector_GenerateInteractableCardSelection;
-			On.RoR2.VehicleSeat.OnPassengerExit -= VehicleSeat_OnPassengerExit;
+			On.RoR2.ShrineChanceBehavior.AddShrineStack -= this.ShrineChanceBehavior_AddShrineStack;
+			On.RoR2.SceneDirector.PopulateScene -= this.SceneDirector_PopulateScene;
+			On.RoR2.SceneDirector.GenerateInteractableCardSelection -= this.SceneDirector_GenerateInteractableCardSelection;
+			On.RoR2.VehicleSeat.OnPassengerExit -= this.VehicleSeat_OnPassengerExit;
 		}
 
-		private static void ShrineChanceBehavior_AddShrineStack(
+		private void ShrineChanceBehavior_AddShrineStack(
 			On.RoR2.ShrineChanceBehavior.orig_AddShrineStack origAddShrineStack,
 			ShrineChanceBehavior self,
 			Interactor activator) {
@@ -86,7 +86,7 @@ namespace ShrineBag {
 			}
 		}
 
-		private static WeightedSelection<DirectorCard> SceneDirector_GenerateInteractableCardSelection(
+		private WeightedSelection<DirectorCard> SceneDirector_GenerateInteractableCardSelection(
 			On.RoR2.SceneDirector.orig_GenerateInteractableCardSelection origGenerateInteractableCardSelection,
 			SceneDirector self) {
 			WeightedSelection<DirectorCard> directorWeights = origGenerateInteractableCardSelection(self);
@@ -102,7 +102,7 @@ namespace ShrineBag {
 			return directorWeights;
 		}
 
-		private static void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene origPopulateScene, SceneDirector self) {
+		private void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene origPopulateScene, SceneDirector self) {
 			if(!NetworkServer.active || self == null) {
 				origPopulateScene(self);
 				return;
@@ -110,30 +110,47 @@ namespace ShrineBag {
 
 			TheEvilCouncil.Prepare();
 
-			ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
-				?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
+			try {
+				ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
+					?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
 
-			if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f, 0.01f))
-				spawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
-			else if(spawnCardManager.Initialized)
-				spawnCardManager.ResetCreditCost();
-
-			origPopulateScene(self);
+				if(Enabled.Value && !CreditsFactor.Value.AboutEquals(1f, 0.01f))
+					spawnCardManager.ApplyCreditCostFactor(CreditsFactor.Value);
+				else if(spawnCardManager.Initialized)
+					spawnCardManager.ResetCreditCost();
+			} catch(Exception ex) {
+#if DEBUG
+				this.Logger.LogError($"Failed to set Shrine of Chance Spawn Card credit cost: {ex}");
+#endif
+			} finally {
+				origPopulateScene(self);
+			}
 		}
 
-		private static void VehicleSeat_OnPassengerExit(On.RoR2.VehicleSeat.orig_OnPassengerExit origOnPassengerExit, VehicleSeat self, GameObject passenger) {
+		private void VehicleSeat_OnPassengerExit(On.RoR2.VehicleSeat.orig_OnPassengerExit origOnPassengerExit, VehicleSeat self, GameObject passenger) {
 			origOnPassengerExit(self, passenger);
 
-			if(!NetworkServer.active || self == null || passenger == null || !Enabled.Value)
+			if(!NetworkServer.active || self == null || passenger == null || !Enabled.Value || !CouncilEnabled.Value)
 				return;
 
-			if(!self.currentPassengerBody.isPlayerControlled || Run.instance.stageClearCount != 0)
-				return;
+			try {
+				CharacterBody passengerBody = self.currentPassengerBody ?? passenger.GetComponent<CharacterBody>();
 
-			if(TheEvilCouncil.AlreadySpawned || !CouncilEnabled.Value)
-				return;
+				if(passengerBody == null || !passengerBody.isPlayerControlled)
+					return;
 
-			TheEvilCouncil.BeEvil(CouncilSize.Value);
+				if(Run.instance == null || Run.instance.stageClearCount != 0)
+					return;
+
+				if(TheEvilCouncil.AlreadySpawned)
+					return;
+
+				TheEvilCouncil.BeEvil(CouncilSize.Value);
+			} catch(Exception ex) {
+#if DEBUG
+				this.Logger.LogError($"Failed to spawn {CouncilSize.Value} Shrines of Chance circle around player: {ex}");
+#endif
+			}
 		}
 
 		private void RegisterSettings() {
