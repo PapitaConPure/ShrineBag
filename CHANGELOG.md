@@ -1,3 +1,7 @@
+### v1.2.3
+* Fixed Drifter's Repossess/Hex of Haunting's interactable throw/fall functions not working properly when the mod is enabled (these use the same event as when you get out of the escape pod for some reason, and that event is consumed by the mod for testing).
+* Fixed "Credit Cost Multiplier" and "Weight Multiplier" completely breaking interactable generation on stages with no Shrine of Chance. Also, these settings now actually work with the snowy and sandy SoC variants.
+
 ### v1.2.2
 * Reduce mod size to tiny levels by casting some color quantization spells upon the dummy fat PNG icons.
 
