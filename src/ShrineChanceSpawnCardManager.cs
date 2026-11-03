@@ -1,6 +1,8 @@
 ﻿using RoR2;
 using ShrineBag.Settings;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -9,9 +11,16 @@ namespace ShrineBag {
 	/// Represents a reduced Shrine of Chance Interactable Spawn Card (IRC) Manager
 	/// </summary>
 	internal sealed class ShrineChanceSpawnCardManager: MonoBehaviour {
+		private record SpawnCardWithOriginalCost(InteractableSpawnCard SpawnCard, int OriginalCost);
+
+		private static readonly string[] SHRINE_CHANCE_ASSET_VARIANT_PATHS = [
+			"RoR2/Base/ShrineChance/iscShrineChance.asset",
+			"RoR2/Base/ShrineChance/iscShrineChanceSnowy.asset",
+			"RoR2/Base/ShrineChance/iscShrineChanceSandy.asset"
+		];
+
 		private bool initialized;
-		private int originalCreditCost;
-		private InteractableSpawnCard spawnCard;
+		private SpawnCardWithOriginalCost[] spawnCardVariants;
 
 		public bool Initialized => this.initialized;
 
@@ -29,7 +38,8 @@ namespace ShrineBag {
 				this.Initialize();
 
 			float factor = ModSettings.CreditsFactor.Constraint.Clamp(configuredFactor);
-			this.spawnCard.directorCreditCost = (int)MathF.Round(this.originalCreditCost * factor);
+			foreach(SpawnCardWithOriginalCost variant in this.spawnCardVariants)
+				variant.SpawnCard.directorCreditCost = (int)MathF.Round(variant.OriginalCost * factor);
 		}
 
 		/// <summary>
@@ -42,33 +52,36 @@ namespace ShrineBag {
 			if(!this.initialized)
 				this.Initialize();
 
-			int choiceIndex = this.FindCardChoice(directorWeights, out WeightedSelection<DirectorCard>.ChoiceInfo choice);
+			int choiceIndex = this.FindShrineChanceCardChoice(directorWeights, out WeightedSelection<DirectorCard>.ChoiceInfo choice);
 			float factor = ModSettings.WeightFactor.Constraint.Clamp(configuredFactor);
 			directorWeights.ModifyChoiceWeight(choiceIndex, choice.weight * factor);
 		}
 
 		/// <summary>
-		/// Resets the credit cost of the Shrine of Chance's Spawn Card to the originally perceived value.
+		/// Resets the credit cost of the Shrine of Chance's Spawn Cards to the values perceived during initialization.
 		/// </summary>
 		internal void ResetCreditCost() {
 			if(!this.initialized)
 				this.Initialize();
 
-			this.spawnCard.directorCreditCost = this.originalCreditCost;
+			foreach(SpawnCardWithOriginalCost variant in this.spawnCardVariants)
+				variant.SpawnCard.directorCreditCost = variant.OriginalCost;
 		}
 
 		/// <summary>
 		/// Initializes this manager.
 		/// </summary>
 		private void Initialize() {
-			InteractableSpawnCard spawnCard = Addressables
-				.LoadAssetAsync<InteractableSpawnCard>("RoR2/Base/ShrineChance/iscShrineChance.asset")
-				.WaitForCompletion() ?? throw new InvalidOperationException(
-					"Failed to load Shrine of Chance InteractableSpawnCard."
-				);
+			this.spawnCardVariants = [..
+				SHRINE_CHANCE_ASSET_VARIANT_PATHS
+					.Select(assetVariantPath => Addressables
+						.LoadAssetAsync<InteractableSpawnCard>(assetVariantPath)
+						.WaitForCompletion() ?? throw new InvalidOperationException(
+							$"Failed to load Shrine of Chance variant InteractableSpawnCard asset from path: {assetVariantPath}."
+						))
+					.Select(v => new SpawnCardWithOriginalCost(v, v.directorCreditCost))
+			];
 
-			this.originalCreditCost = spawnCard.directorCreditCost;
-			this.spawnCard = spawnCard;
 			this.initialized = true;
 		}
 
@@ -79,17 +92,17 @@ namespace ShrineBag {
 		/// <param name="choice"></param>
 		/// <returns></returns>
 		/// <exception cref="InvalidOperationException"></exception>
-		private int FindCardChoice(WeightedSelection<DirectorCard> directorWeights, out WeightedSelection<DirectorCard>.ChoiceInfo choice) {
+		private int FindShrineChanceCardChoice(WeightedSelection<DirectorCard> directorWeights, out WeightedSelection<DirectorCard>.ChoiceInfo choice) {
 			for(int i = 0; i < directorWeights.Count; i++) {
 				WeightedSelection<DirectorCard>.ChoiceInfo c = directorWeights.GetChoice(i);
-				if(c.value.spawnCard == this.spawnCard) {
+				if(this.spawnCardVariants.Any(sc => c.value.spawnCard == sc.SpawnCard)) {
 					choice = c;
 					return i;
 				}
 			}
 
 			throw new InvalidOperationException("Failed to find the ChoiceInfo associated to this manager's Spawn Card within the supplied WeightedSelection." +
-				$"\nthis.spawnCard={this.spawnCard}");
+				$"\nthis.spawnCardVariants[.SpawnCard]=\n{string.Join("\n", this.spawnCardVariants.Select(v => v.SpawnCard))}");
 		}
 	}
 }
