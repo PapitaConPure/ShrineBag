@@ -132,9 +132,7 @@ namespace ShrineBag {
 				else if(spawnCardManager.Initialized)
 					spawnCardManager.ResetCreditCost();
 			} catch(Exception ex) {
-#if DEBUG
 				this.Logger.LogError($"Failed to set Shrine of Chance Spawn Card credit cost: {ex}");
-#endif
 			} finally {
 				origPopulateScene(self);
 			}
@@ -160,9 +158,7 @@ namespace ShrineBag {
 
 				TheEvilCouncil.BeEvil(CouncilSize.Value);
 			} catch(Exception ex) {
-#if DEBUG
 				this.Logger.LogError($"Failed to spawn {CouncilSize.Value} Shrines of Chance circle around player: {ex}");
-#endif
 			}
 		}
 
