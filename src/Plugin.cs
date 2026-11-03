@@ -9,6 +9,10 @@ using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#if DEBUG
+using System.Linq;
+#endif
+
 namespace ShrineBag {
 	[BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 	[NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
@@ -101,7 +105,11 @@ namespace ShrineBag {
 				spawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
 			} catch(Exception ex) {
 				this.Logger.LogWarning($"Couldn't apply Shrine of Chance Spawn Card weight factor: {ex}"
-					+ $"\nGot WeightedSelection with {directorWeights.Count} Spawn Cards.");
+#if DEBUG
+					+ $"\nGot WeightedSelection with {directorWeights.Count} Spawn Card choices:"
+					+ $"\n{string.Join("\n", directorWeights.choices.Select(c => $"* {c.weight} =?> ${c.value.cost} / {c.value.spawnCard.name}"))}"
+#endif
+				);
 			}
 
 			return directorWeights;
