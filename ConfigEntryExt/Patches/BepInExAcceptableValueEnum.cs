@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ShrineBag.Settings {
+namespace ConfigEntryExt.Patches {
 	//why the fuck is AcceptableValueList constrained to IEquatable<T> im going to ggghghtrhrgAERHAWWWGAERATHRYSHGJN
 	internal sealed class AcceptableValueEnum<TValue>: AcceptableValueBase where TValue : IComparable {
 		public IReadOnlyList<TValue> AcceptableValues { get; }
@@ -25,6 +25,6 @@ namespace ShrineBag.Settings {
 			=> value is TValue v && this.AcceptableValues.Contains(v);
 
 		public override string ToDescriptionString()
-			=> "# Acceptable values: " + string.Join(", ", [.. this.AcceptableValues.Select((TValue x) => x.ToString())]);
+			=> "# Acceptable values: " + string.Join(", ", [.. this.AcceptableValues.Select((x) => x.ToString())]);
 	}
 }

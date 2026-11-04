@@ -53,6 +53,10 @@
 		<PackageReference Include="RoR2BepInExPack" Version="*" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\ConfigEntryExt\ConfigEntryExt.csproj" />
+	</ItemGroup>
+
 	<ItemGroup Condition="'$(EnableRiskOfOptions)' == 'true'">
 		<PackageReference Include="Rune580.Mods.RiskOfRain2.RiskOfOptions" Version="2.8.6" />
 	</ItemGroup>

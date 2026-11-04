@@ -15,6 +15,12 @@ namespace ShrineBag {
 		private bool initialized;
 		private System.Random rng;
 
+		public enum BagGenModeKey {
+			Exact,
+			Random,
+			Infinite,
+		}
+
 		/// <summary>
 		/// Whether the market ran out of usable bags (<see langword="true"/>) or not (<see langword="false"/>).
 		/// </summary>
@@ -26,15 +32,15 @@ namespace ShrineBag {
 		/// <param name="configuredBagRewardCount">The configured reward count for each bag.</param>
 		/// <param name="configuredBagFailureCount">The configured failure count for each bag.</param>
 		/// <param name="configuredBagGenMode">The configured bag generation mode.</param>
-		/// <param name="configuredBagGenCount">The configured bag generation count, for when the mode is set to <see cref="ModSettings.BagGenModeKey.Exact"/> or <see cref="ModSettings.BagGenModeKey.Random"/>.</param>
+		/// <param name="configuredBagGenCount">The configured bag generation count, for when the mode is set to <see cref="BagGenModeKey.Exact"/> or <see cref="BagGenModeKey.Random"/>.</param>
 		/// <remarks>Creates the first bag under <see cref="currentBag"/>.</remarks>
 		private void Initialize(
 			int configuredBagRewardCount,
 			int configuredBagFailureCount,
-			ModSettings.BagGenModeKey configuredBagGenMode,
+			BagGenModeKey configuredBagGenMode,
 			int configuredBagGenCount,
 			bool onlyTrimLastBag) {
-			ModSettings.BagGenModeKey bagGenMode = ModSettings.BagGenMode.Constraint.Clamp(configuredBagGenMode);
+			BagGenModeKey bagGenMode = ModSettings.BagGenMode.Constraint.Clamp(configuredBagGenMode);
 			int bagGenCount = ModSettings.BagGenCount.Constraint.Clamp(configuredBagGenCount);
 
 			int sakuna = 397;
@@ -42,12 +48,12 @@ namespace ShrineBag {
 
 			this.usedBags = 0;
 			this.totalBags = bagGenMode switch {
-				ModSettings.BagGenModeKey.Exact => bagGenCount,
-				ModSettings.BagGenModeKey.Random => this.rng.Next(1, bagGenCount + 1),
+				BagGenModeKey.Exact => bagGenCount,
+				BagGenModeKey.Random => this.rng.Next(1, bagGenCount + 1),
 				_ => -1,
 			};
 			this.onlyTrimLastBag = onlyTrimLastBag;
-			this.infinite = bagGenMode == ModSettings.BagGenModeKey.Infinite;
+			this.infinite = bagGenMode == BagGenModeKey.Infinite;
 
 			this.TryCreateBag(configuredBagRewardCount, configuredBagFailureCount);
 
@@ -60,13 +66,13 @@ namespace ShrineBag {
 		/// <param name="configuredBagRewardCount">The configured reward count.</param>
 		/// <param name="configuredBagFailureCount">The configured failure count.</param>
 		/// <param name="bagGenMode">The configured bag generation mode.</param>
-		/// <param name="bagGenCount">The configured bag generation count, for when the mode is set to <see cref="ModSettings.BagGenModeKey.Exact"/> or <see cref="ModSettings.BagGenModeKey.Random"/>.</param>
+		/// <param name="bagGenCount">The configured bag generation count, for when the mode is set to <see cref="BagGenModeKey.Exact"/> or <see cref="BagGenModeKey.Random"/>.</param>
 		/// <param name="bag">The obtained bag.</param>
 		/// <returns>Whether a usable bag could be obtained (<see langword="true"/>) or not (<see langword="false"/>).</returns>
 		public bool TryGetUsableBag(
 			int configuredBagRewardCount,
 			int configuredBagFailureCount,
-			ModSettings.BagGenModeKey bagGenMode,
+			BagGenModeKey bagGenMode,
 			int bagGenCount,
 			bool onlyTrimLastBag,
 			out ShrineChanceBag bag) {

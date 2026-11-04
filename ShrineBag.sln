@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShrineBag", "src\ShrineBag.csproj", "{6E2AA053-E440-A868-C50B-F86E1B3F2747}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigEntryExt", "ConfigEntryExt\ConfigEntryExt.csproj", "{03628E17-415E-4421-B149-E8B0F4EA4A8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6E2AA053-E440-A868-C50B-F86E1B3F2747}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E2AA053-E440-A868-C50B-F86E1B3F2747}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E2AA053-E440-A868-C50B-F86E1B3F2747}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03628E17-415E-4421-B149-E8B0F4EA4A8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03628E17-415E-4421-B149-E8B0F4EA4A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03628E17-415E-4421-B149-E8B0F4EA4A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03628E17-415E-4421-B149-E8B0F4EA4A8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

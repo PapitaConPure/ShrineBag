@@ -8,6 +8,7 @@ using ShrineBag.Utils;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
+using static ShrineBag.ShrineChanceBagMarket;
 
 #if DEBUG
 using System.Linq;
@@ -21,7 +22,7 @@ namespace ShrineBag {
 		internal static ConfigEntry<bool> Enabled;
 		internal static ConfigEntry<int> RewardCount;
 		internal static ConfigEntry<int> FailureCount;
-		internal static ConfigEntry<ModSettings.BagGenModeKey> BagGenMode;
+		internal static ConfigEntry<BagGenModeKey> BagGenMode;
 		internal static ConfigEntry<int> BagGenCount;
 		internal static ConfigEntry<bool> OnlyTrimLast;
 
@@ -98,10 +99,10 @@ namespace ShrineBag {
 			if(!NetworkServer.active || self == null || directorWeights == null || !Enabled.Value || WeightFactor.Value.AboutEquals(1f, 0.01f))
 				return directorWeights;
 
-			ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
-				?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
-
 			try {
+				ShrineChanceSpawnCardManager spawnCardManager = self.GetComponent<ShrineChanceSpawnCardManager>()
+					?? self.gameObject.AddComponent<ShrineChanceSpawnCardManager>();
+
 				spawnCardManager.ApplyWeightFactor(directorWeights, WeightFactor.Value);
 			} catch(Exception ex) {
 				this.Logger.LogWarning($"Couldn't apply Shrine of Chance Spawn Card weight factor: {ex}"
@@ -180,28 +181,28 @@ namespace ShrineBag {
 		}
 
 		private void TryRegisterRiskOfOptions() {
-			if(!ModSettingsManagerCompat.Enabled)
+			if(!RiskOfOptionsCompatManager.Enabled)
 				return;
 
 			try {
-				ModSettingsManagerCompat.SetModDescription(
+				RiskOfOptionsCompatManager.SetModDescription(
 					"Makes Shrines of Chance use finite, shuffled bags instead of being fully random!");
-				ModSettingsManagerCompat.SetModIcon(ModIcon.Load());
+				RiskOfOptionsCompatManager.SetModIcon(ModIcon.Load());
 
-				ModSettingsManagerCompat.AddCheckboxOption(Enabled);
-				ModSettingsManagerCompat.AddSliderOption(RewardCount);
-				ModSettingsManagerCompat.AddSliderOption(FailureCount);
-				ModSettingsManagerCompat.AddChoiceOption(BagGenMode);
-				ModSettingsManagerCompat.AddSliderOption(BagGenCount);
-				ModSettingsManagerCompat.AddCheckboxOption(OnlyTrimLast);
+				RiskOfOptionsCompatManager.AddCheckboxOption(Enabled);
+				RiskOfOptionsCompatManager.AddSliderOption(RewardCount);
+				RiskOfOptionsCompatManager.AddSliderOption(FailureCount);
+				RiskOfOptionsCompatManager.AddChoiceOption(BagGenMode);
+				RiskOfOptionsCompatManager.AddSliderOption(BagGenCount);
+				RiskOfOptionsCompatManager.AddCheckboxOption(OnlyTrimLast);
 
-				ModSettingsManagerCompat.AddSliderOption(CreditsFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
-				ModSettingsManagerCompat.AddSliderOption(WeightFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
+				RiskOfOptionsCompatManager.AddSliderOption(CreditsFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
+				RiskOfOptionsCompatManager.AddSliderOption(WeightFactor, new(FormatString: "x{0:0.00}", Step: 0.01f));
 
-				ModSettingsManagerCompat.AddCheckboxOption(CouncilEnabled);
-				ModSettingsManagerCompat.AddSliderOption(CouncilSize);
+				RiskOfOptionsCompatManager.AddCheckboxOption(CouncilEnabled);
+				RiskOfOptionsCompatManager.AddSliderOption(CouncilSize);
 
-				ModSettingsManagerCompat.AddCheckboxOption(Megumin);
+				RiskOfOptionsCompatManager.AddCheckboxOption(Megumin);
 			} catch(Exception exception) {
 				this.Logger.LogWarning($"Could not register Risk of Options settings: {exception}");
 			}

@@ -1,12 +1,16 @@
-﻿namespace ShrineBag.Settings {
-	internal static partial class ModSettings {
-		public static readonly Entry<bool> Enabled = new(
+﻿using ConfigEntryExt;
+using ConfigEntryExt.Constraints;
+using static ShrineBag.ShrineChanceBagMarket;
+
+namespace ShrineBag.Settings {
+	internal static class ModSettings {
+		public static readonly ConfigEntryExt<bool> Enabled = new(
 			section: "General",
 			name: "Enabled",
 			description: "Enables the mod.",
 			defaultValue: true);
 
-		public static readonly ConstrainedEntry<int, RangeEntryConstraint<int>> RewardCount = new(
+		public static readonly ConstrainedConfigEntry<int, RangeEntryConstraint<int>> RewardCount = new(
 			section: "General",
 			name: "Total Rewards per Bag",
 			description: Paragraph(
@@ -15,7 +19,7 @@
 			defaultValue: 2,
 			constraint: new(Min: 1, Max: 20));
 
-		public static readonly ConstrainedEntry<int, RangeEntryConstraint<int>> FailureCount = new(
+		public static readonly ConstrainedConfigEntry<int, RangeEntryConstraint<int>> FailureCount = new(
 			section: "General",
 			name: "Max. Failures per Bag",
 			description: Paragraph(
@@ -24,13 +28,7 @@
 			defaultValue: 4,
 			constraint: new(Min: 0, Max: 20));
 
-		public enum BagGenModeKey {
-			Exact,
-			Random,
-			Infinite,
-		}
-
-		public static readonly ConstrainedEntry<BagGenModeKey, ListEntryConstraint<BagGenModeKey>> BagGenMode = new(
+		public static readonly ConstrainedConfigEntry<BagGenModeKey, ListEntryConstraint<BagGenModeKey>> BagGenMode = new(
 			section: "General",
 			name: "Bag Gen. Mode",
 			description: Paragraph(
@@ -44,7 +42,7 @@
 			defaultValue: BagGenModeKey.Exact,
 			constraint: new(typeof(BagGenModeKey)));
 
-		public static readonly ConstrainedEntry<int, RangeEntryConstraint<int>> BagGenCount = new(
+		public static readonly ConstrainedConfigEntry<int, RangeEntryConstraint<int>> BagGenCount = new(
 			section: "General",
 			name: "Bag Gen. Count",
 			description: Paragraph(
@@ -57,7 +55,7 @@
 			defaultValue: 1,
 			constraint: new(Min: 1, Max: 5));
 
-		public static readonly Entry<bool> OnlyTrimLastBag = new(
+		public static readonly ConfigEntryExt<bool> OnlyTrimLastBag = new(
 			section: "General",
 			name: "Only Trim Last Bag",
 			description: Paragraph(
@@ -67,7 +65,7 @@
 				"* When disabled, every bag is trimmed. This makes in-between bags that would otherwise end with one or more failures smaller."),
 			defaultValue: true);
 
-		public static readonly ConstrainedEntry<float, RangeEntryConstraint<float>> CreditsFactor = new(
+		public static readonly ConstrainedConfigEntry<float, RangeEntryConstraint<float>> CreditsFactor = new(
 			section: "Balancing",
 			name: "Credit Cost Multiplier",
 			description: Paragraph(
@@ -76,7 +74,7 @@
 			defaultValue: 1f,
 			constraint: new(Min: 0.1f, Max: 8f));
 
-		public static readonly ConstrainedEntry<float, RangeEntryConstraint<float>> WeightFactor = new(
+		public static readonly ConstrainedConfigEntry<float, RangeEntryConstraint<float>> WeightFactor = new(
 			section: "Balancing",
 			name: "Weight Multiplier",
 			description: Paragraph(
@@ -85,23 +83,26 @@
 			defaultValue: 1f,
 			constraint: new(Min: 0.1f, Max: 8f));
 
-		public static readonly Entry<bool> CouncilEnabled = new(
+		public static readonly ConfigEntryExt<bool> CouncilEnabled = new(
 			section: "Testing",
 			name: "Spawn The Council",
 			description: "Spawns 'The Council' on stage 1 for testing purposes.",
 			defaultValue: false);
 
-		public static readonly ConstrainedEntry<int, RangeEntryConstraint<int>> CouncilSize = new(
+		public static readonly ConstrainedConfigEntry<int, RangeEntryConstraint<int>> CouncilSize = new(
 			section: "Testing",
 			name: "Council Size",
 			description: "Number of members that constitute 'The Council'.",
 			defaultValue: 5,
 			constraint: new(Min: 3, Max: 12));
 
-		public static readonly Entry<bool> Megumin = new(
+		public static readonly ConfigEntryExt<bool> Megumin = new(
 			section: "Megumin",
 			name: "Megumin",
 			description: "Megumin",
 			defaultValue: true);
+
+		private static string Paragraph(params string[] lines)
+			=> string.Join("\n", lines);
 	}
 }

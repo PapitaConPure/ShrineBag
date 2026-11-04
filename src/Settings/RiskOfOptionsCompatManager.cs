@@ -2,7 +2,6 @@
 using BepInEx.Configuration;
 using System;
 
-
 #if RISK_OF_OPTIONS
 using RiskOfOptions;
 using RiskOfOptions.Options;
@@ -10,7 +9,7 @@ using RiskOfOptions.OptionConfigs;
 #endif
 
 namespace ShrineBag.Settings {
-	internal static class ModSettingsManagerCompat {
+	internal static class RiskOfOptionsCompatManager {
 		private static bool? enabled;
 
 		public static bool Enabled {
